@@ -1,11 +1,22 @@
+from flask import Flask
+from threading import Thread
 from telegram import Update
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 
-# Function to handle the /start command
+# Flask app for keep-alive
+app = Flask(__name__)
+
+@app.route("/")
+def home():
+    return "The bot is alive!"
+
+def run():
+    app.run(host="0.0.0.0", port=8080)
+
+# Telegram bot functions
 def start(update: Update, context: CallbackContext) -> None:
     update.message.reply_text("Hello! I'm your bot. Send me any message, and I'll echo it back.")
 
-# Function to echo messages
 def echo(update: Update, context: CallbackContext) -> None:
     update.message.reply_text(update.message.text)
 
@@ -14,14 +25,15 @@ def main():
     bot_token = '6980962954:AAG_hAi4fwNaxW0eARXkH4AxfRlO6i1u_DQ'
     updater = Updater(bot_token)
 
-    # Get the dispatcher to register handlers
+    # Register handlers
     dp = updater.dispatcher
-
-    # Add command and message handlers
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(MessageHandler(Filters.text & ~Filters.command, echo))
 
-    # Start the bot
+    # Start the bot in a separate thread
+    Thread(target=run).start()
+
+    # Start polling
     updater.start_polling()
     updater.idle()
 
