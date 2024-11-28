@@ -1,7 +1,7 @@
 from flask import Flask
 from threading import Thread
 from telegram import Update
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+from telegram.ext import Updater, CommandHandler, MessageHandler, filters, CallbackContext
 
 # Flask app for keep-alive
 app = Flask(__name__)
@@ -28,7 +28,7 @@ def main():
     # Register handlers
     dp = updater.dispatcher
     dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(MessageHandler(Filters.text & ~Filters.command, echo))
+    dp.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
 
     # Start the bot in a separate thread
     Thread(target=run).start()
